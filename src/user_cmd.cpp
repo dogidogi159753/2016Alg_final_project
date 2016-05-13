@@ -53,7 +53,7 @@ ReadGraphCmd::ReadGraphCmd(const char * const name, CmdMgr *cmdMgr) : Cmd(name) 
 
     cmdMgr_ = cmdMgr;
     optMgr_.setShortDes("read graph");
-    optMgr_.setDes("read the graph in dot format");
+    optMgr_.setDes("read the graph in verilog format");
 
     optMgr_.regArg(new Arg(Arg::REQ, "input dot file", "INPUT"));
 
