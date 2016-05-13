@@ -1,26 +1,16 @@
 AR       := ar
 ARFLAGS  := cr
 CXX      := g++
-CPPFLAGS := -O2 -I../lib
+CPPFLAGS := -O2
 
-all : ../bin/graphlab
-	@echo -n ""
+all : test
+	@echo -n "test\n"
 
 clean :
-	rm *.o ../bin/graphlab
+	rm *.o test
 
-../bin/graphlab : main.o graph.o sys_cmd.o user_cmd.o ../lib/libgraphlab.a
-	$(CXX) $^ -o $@
+test : main.cpp read_verilog.o
+	$(CXX) $(CPPFLAGS) $^ -o $@
 
-main.o : main.cpp graph.h sys_cmd.h user_cmd.h
+read_verilog.o : read_verilog.cpp read_verilog.h
 	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-graph.o : graph.cpp graph.h
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-sys_cmd.o : sys_cmd.cpp sys_cmd.h ../lib/cmd.h
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-user_cmd.o : user_cmd.cpp user_cmd.h ../lib/cmd.h
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-

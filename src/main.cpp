@@ -8,10 +8,23 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
-#include "sys_cmd.h"
+#include "read_verilog.h"
+
+int main( int argc, char **argv ) {
+    if( argc != 2 ) {
+        fprintf( stderr, "**ERROR main(): " );
+        fprintf( stderr, "wrong argument\n" );
+        return 0;
+    }
+    read_verilog( argv[1] );
+    return 0;
+}
+
+/*#include "sys_cmd.h"
 #include "user_cmd.h"
 #include "graph.h"
 using namespace CommonNs;
@@ -120,5 +133,5 @@ void initCmds(CmdMgr *mgr) {
   mgr->regCmd(write_tree_bfsCmd);
   mgr->regCmd(write_dijkstraCmd);
 
-}
+}*/
 
