@@ -19,11 +19,11 @@
 
 using namespace std;
 
-enum	GateType { INPUT = 0, OUTPUT, NOT, AND, NAND, OR, NOR };
+enum	GateType { INPUT = 0, OUTPUT, WIRE, NOT, AND, NAND, OR, NOR };
 
 class Node;
 
-class Edge {
+/*class Edge {
 
 	public:
 		Edge (string name, const int& id);
@@ -41,20 +41,20 @@ class Edge {
 
 		bool operator < (const Edge& rhs) const;
 
-};
+};*/
 
 class Node {
 
 	public:
 		Node (string n, GateType type);
-		void addEdge (Edge *e, int flag);
+		// void addEdge (Edge *e, int flag);
 		// flag = 0:in, 1:out
 
 		string   name;
 		GateType type;
 		bool     traveled;
-		vector<Edge*> in;
-		vector<Edge*> out;
+		vector<Node*> in;
+		vector<Node*> out;
 
 		int d;
 		int i;
@@ -66,16 +66,15 @@ class Node {
 class Graph {
 
 	public:
-		Graph(const string& n = string("gn"));
+		Graph(const string& n = string("case"));
 		~Graph();
 		
 		void addEdge(string name, const int& id);
 		void addInput(string name);
 		void addOutput(string name);
-		void addGate(string name, GateType type,
-			     Node *A = 0, Node *Y = 0, Node *B = 0);
-		void sortEdgesOfNode();
-		void sortEdgesByWeight();
+		void addGate(string name, GateType type);
+		// void sortEdgesOfNode();
+		// void sortEdgesByWeight();
 		void init();
 		Node * getNode(string name);
 		int  DFS_Visit(Node* u, int time, ofstream& o);
@@ -83,7 +82,7 @@ class Graph {
 		map<string, Node *> inputs;
 		map<string, Node *> outputs;
 		map<string, Node *> gates;
-		map<string, Edge *> wires;
+		map<string, Node *> wires;
 		string name;
 };
 

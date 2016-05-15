@@ -6,7 +6,7 @@
 // **************************************************************************
 #include "graph.h"
 
-Edge::Edge(string name, const int& id)
+/*Edge::Edge(string name, const int& id)
 {
 	this->name = name;
 	this->id = id;
@@ -21,7 +21,7 @@ Node * Edge::getNeighbor(Node *n)
 	if ( node[1] == n ) return node[0];
 
 	return 0;
-}
+}*/
 
 
 Node::Node (string n, GateType type)
@@ -33,7 +33,7 @@ Node::Node (string n, GateType type)
 	prev = 0;
 }
 
-void Node::addEdge (Edge *e, int flag)
+/*void Node::addEdge (Edge *e, int flag)
 {
 	if(flag == 0) {
 		
@@ -41,7 +41,7 @@ void Node::addEdge (Edge *e, int flag)
 	else {
 		
 	}
-}
+}*/
 
 Graph::Graph(const string& n)
 {
@@ -50,14 +50,12 @@ Graph::Graph(const string& n)
 
 Graph::~Graph()
 {
-	map<string, Edge *>::iterator itE;
-	for ( itE = wires.begin() ; itE != wires.end() ; itE++ )
-	{
-		delete (*itE).second;
-		(*itE).second = 0;
-	}
-	
 	map<string, Node *>::iterator itN;
+	for ( itN = wires.begin() ; itN != wires.end() ; itN++ )
+	{
+		delete (*itN).second;
+		(*itN).second = 0;
+	}
 	for ( itN = gates.begin() ; itN != gates.end() ; itN++ )
 	{
 		delete (*itN).second;
@@ -77,7 +75,7 @@ Graph::~Graph()
 		
 void Graph::addEdge(string name, const int& id)
 {
-	Edge *e = new Edge(name, id);
+	Node *e = new Node(name, GateType(WIRE));
 	wires[name] = e;
 }
 
@@ -93,7 +91,7 @@ void Graph::addOutput(string name)
 	outputs[name] = n;
 }
 
-void Graph::addGate(string name, GateType type, Node *A, Node *Y, Node *B )
+void Graph::addGate(string name, GateType type)
 {
 	Node *n;
 	switch(type) {
@@ -120,7 +118,7 @@ void Graph::addGate(string name, GateType type, Node *A, Node *Y, Node *B )
 	}
 }
 	
-void Graph::sortEdgesOfNode()
+/*void Graph::sortEdgesOfNode()
 {
 
 }
@@ -145,7 +143,7 @@ void Graph::init()
 		node->prev = 0;
 	}
 	
-}
+}*/
 
 Node * Graph::getNode(string name)
 {

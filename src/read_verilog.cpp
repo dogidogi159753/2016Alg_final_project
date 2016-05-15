@@ -88,51 +88,77 @@ bool read_verilog( const char* name, Graph* g ) {
 
             tok2 = strtok( NULL, " ");
             string name(tok2);
+            g->addGate( name, t);
+            Node *gt = g->gates[name];
             tok2 = strtok( NULL, " (" );
             tok2 = strtok( NULL, ")" );
             if( t == NOT) {
                 string tmp(tok2);
                 if( g->inputs.find(tmp) != g->inputs.end() ) {
+                    g->inputs[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->inputs[tmp] );
                 }
                 else if( g->outputs.find(tmp) != g->outputs.end() ) {
+                    g->outputs[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->outputs[tmp] );
                 }
                 else {
+                    g->wires[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->wires[tmp] );
                 }
                 tok2 = strtok( NULL, "(" );
                 tok2 = strtok( NULL, ")" );
                 tmp = string(tok2);
                 if( g->outputs.find(tmp) != g->outputs.end() ) {
+                    g->outputs[tmp]->in.push_back( gt );
+                    gt->out.push_back( g->outputs[tmp] );
                 }
                 else {
+                    g->wires[tmp]->in.push_back( gt );
+                    gt->out.push_back( g->wires[tmp] );
                 }
             }
             else {
                 string tmp(tok2);
                 if( g->inputs.find(tmp) != g->inputs.end() ) {
+                    g->inputs[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->inputs[tmp] );
                 }
                 else if( g->outputs.find(tmp) != g->outputs.end() ) {
+                    g->outputs[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->outputs[tmp] );
                 }
                 else {
+                    g->wires[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->wires[tmp] );
                 }
                 tok2 = strtok( NULL, "(" );
                 tok2 = strtok( NULL, ")" );
                 tmp = string(tok2);
                 if( g->inputs.find(tmp) != g->inputs.end() ) {
+                    g->inputs[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->inputs[tmp] );
                 }
                 else if( g->outputs.find(tmp) != g->outputs.end() ) {
+                    g->outputs[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->outputs[tmp] );
                 }
                 else {
+                    g->wires[tmp]->out.push_back( gt );
+                    gt->in.push_back( g->wires[tmp] );
                 }
                 tok2 = strtok( NULL, "(" );
                 tok2 = strtok( NULL, ")" );
                 tmp = string(tok2);
                 if( g->outputs.find(tmp) != g->outputs.end() ) {
+                    g->outputs[tmp]->in.push_back( gt );
+                    gt->out.push_back( g->outputs[tmp] );
                 }
                 else {
+                    g->wires[tmp]->in.push_back( gt );
+                    gt->out.push_back( g->wires[tmp] );
                 }
             }
-
-            g->addGate( name, t);
         }
         str = tok;
         tok = strchr( str, ';' );

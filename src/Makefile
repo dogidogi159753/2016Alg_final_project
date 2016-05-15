@@ -1,7 +1,7 @@
 AR       := ar
 ARFLAGS  := cr
 CXX      := g++
-CPPFLAGS := -O2
+CPPFLAGS := -g
 
 all : test
 	@echo -n "test\n"
