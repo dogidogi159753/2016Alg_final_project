@@ -1,3 +1,9 @@
+// **************************************************************************
+// File       [ graph.h ]
+// Author     [ dogiJ ]
+// Synopsis   [ ]
+// Date       [ 2016/05/14 created ]
+// **************************************************************************
 #ifndef GRAPH_H
 #define GRAPH_H
 
@@ -13,57 +19,71 @@
 
 using namespace std;
 
+enum	GateType { INPUT = 0, OUTPUT, NOT, AND, NAND, OR, NOR };
+
 class Node;
 
-class Edge{
+class Edge {
 
 	public:
-		Edge(Node *a, Node *b, const int& w);
+		Edge (string name, const int& id);
+		Edge (const int& i) { id = i; }
 		Node* node[2];
-		int weight;
+		string name;
+		int time;
+		int id;
 
-		Node *getNeighbor(Node *n);
+		Node *getNeighbor (Node *n);
+		void addIn (Node *in) { node[0] = in; }
+		void addOut (Node *out) { node[1] = out; }
+		void setTime (const int& t) { time = t; }
+		void addTime (const int& t) { time += t; }
 
 		bool operator < (const Edge& rhs) const;
 
 };
 
-class Node{
+class Node {
 
 	public:
-		Node(const int& i);
-		void addEdge(Edge *e);
-		void sortEdge();
+		Node (string n, GateType type);
+		void addEdge (Edge *e, int flag);
+		// flag = 0:in, 1:out
 
-		int id;
-		// int color; // 0:white, 1:gray, 2:black
-		bool traveled;
-		vector<Edge *> edge;
+		string   name;
+		GateType type;
+		bool     traveled;
+		vector<Edge*> in;
+		vector<Edge*> out;
 
 		int d;
 		int i;
 		int f;
 		Node *prev;
-		int heap_idx;
 };
 
-bool nodeComp (const Node* lhs, const Node* rhs);
 
-class Graph{
+class Graph {
 
 	public:
 		Graph(const string& n = string("gn"));
 		~Graph();
 		
-		void addEdge(const int& v1, const int& v2, const int& w);
+		void addEdge(string name, const int& id);
+		void addInput(string name);
+		void addOutput(string name);
+		void addGate(string name, GateType type,
+			     Node *A = 0, Node *Y = 0, Node *B = 0);
 		void sortEdgesOfNode();
 		void sortEdgesByWeight();
 		void init();
-		Node * getNodeById(const int& id);
+		Node * getNode(string name);
 		int  DFS_Visit(Node* u, int time, ofstream& o);
 
-		map<int, Node *> nodes;
-		vector<Edge *> edges;
+		map<string, Node *> inputs;
+		map<string, Node *> outputs;
+		map<string, Node *> gates;
+		map<string, Edge *> wires;
 		string name;
 };
 

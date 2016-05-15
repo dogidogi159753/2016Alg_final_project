@@ -7,5 +7,8 @@
 
 #ifndef _READ_VERILOG_H_
 #define _READ_VERILOG_H_
-bool read_verilog( const char* name );
+
+#include "graph.h"
+
+bool read_verilog( const char* name, Graph* g );
 #endif
