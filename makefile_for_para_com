@@ -8,17 +8,16 @@ ARFLAGS = rcv
 # -O2 option is for optimized version
 DBGFLAGS = -g -D_DEBUG_ON_
 OPTFLAGS = -O2
-
-all	:	bin/parallel_computing
+OPENMB	= -fopenmp
+OMP_NUM_THREADS=2
+export OMP_NUM_THREADS
+all	: 	bin/parallel_computing_thread_num
 	@echo -n ""
 
-# optimized version
-bin/parallel_computing	:	parallel_computing.o lib
-			$(CC) $(OPTFLAGS) parallel_computing.o -ltm_usage -Llib -o bin/parallel_computing
-parallel_computing.o	:	src/parallel_computing.cc lib/tm_usage.h
-			$(CC) $(CFLAGS) $(OPTFLAGS) $< -o $@
-
-
+bin/parallel_computing_thread_num	:	parallel_computing_thread_num.o
+			$(CC)	$(OPTFLAGS)	$(OPENMB) parallel_computing_thread_num.o -o  bin/parallel_computing_thread_num
+parallel_computing_thread_num.o	:	src/parallel_computing_thread_num.cc
+		$(CC)	$(OPENMB)	$<	-c	$@
 lib: lib/libtm_usage.a
 
 lib/libtm_usage.a: tm_usage.o
