@@ -20,7 +20,9 @@ int main( int argc, char **argv ) {
         fprintf( stderr, "wrong argument\n" );
         return 0;
     }
-    read_verilog( argv[1] );
+    Graph *g = new Graph;
+    read_verilog( argv[1], g );
+    delete g;
     return 0;
 }
 
