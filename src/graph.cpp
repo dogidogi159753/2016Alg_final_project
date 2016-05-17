@@ -24,10 +24,10 @@ Node * Edge::getNeighbor(Node *n)
 }*/
 
 
-Node::Node (string n, GateType type)
+Node::Node (string n, GateType t)
 {
 	name = n;
-	type = type;
+	type = t;
 	traveled = false;
 	d = DIS_INF;
 	prev = 0;
@@ -93,29 +93,8 @@ void Graph::addOutput(string name)
 
 void Graph::addGate(string name, GateType type)
 {
-	Node *n;
-	switch(type) {
-		case NOT:
-			n = new Node(name, type);
-			gates[name] = n;
-			break;
-		case AND:
-			n = new Node(name, type);
-			gates[name] = n;
-			break;
-		case NAND:
-			n = new Node(name, type);
-			gates[name] = n;
-			break;
-		case OR:
-			n = new Node(name, type);
-			gates[name] = n;
-			break;
-		case NOR:
-			n = new Node(name, type);
-			gates[name] = n;
-			break;
-	}
+	Node *n = new Node(name, type);
+	gates[name] = n;
 }
 	
 /*void Graph::sortEdgesOfNode()

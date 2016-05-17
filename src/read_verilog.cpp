@@ -169,6 +169,17 @@ bool read_verilog( const char* name, Graph* g ) {
          << "\nwire: " << g->wires.size()
          << "\ngate: " << g->gates.size() << endl;
 
+    /*for( map<string, Node*>::iterator i = g->gates.begin();
+                                      i != g->gates.end(); i++ ) {
+        Node *n = (*i).second;
+        cout << "gate " << n->name << ":\n"
+             << "type: " << n->type << endl
+             << "in: " << n->in[0]->name << endl;
+        if( n->type != NOT)
+            cout << "in2:" << n->in[1]->name << endl;
+        cout << "out: " << n->out[0]->name << endl;
+    }*/
+
     f.close();
     return true;
 }

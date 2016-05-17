@@ -46,7 +46,7 @@ class Node;
 class Node {
 
 	public:
-		Node (string n, GateType type);
+		Node (string n, GateType t);
 		// void addEdge (Edge *e, int flag);
 		// flag = 0:in, 1:out
 
