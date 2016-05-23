@@ -138,10 +138,8 @@ bool read_verilog( const char* name, Graph* g ) {
         time = g->DFS_Visit(it->second, time);
     }
 
-    int max_delay = 0;
     for( it = g->outputs.begin(); it != g->outputs.end(); it++) {
         Node *n = it->second;
-        if( n->time >= max_delay) max_delay = n->time;
         cout << "name: " << n->name
              << ", time: " << n->time
              << ", d: " << n->d << "\n\n";
