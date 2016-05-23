@@ -13,6 +13,8 @@
 #include <fstream>
 using namespace std;
 
+// need to fix: only NAND and NOR; position of Y, A, B is not fixed
+
 bool read_verilog( const char* name, Graph* g ) {
 
     ifstream f(name);
@@ -33,7 +35,6 @@ bool read_verilog( const char* name, Graph* g ) {
     char *tok = strchr( str, ';' );
     char digits[] = "0123456789";
     int flag = 0;
-    int i;
     while( tok != NULL ) {
         *tok++ = '\0';
         if( flag != 3 ) {
@@ -56,16 +57,13 @@ bool read_verilog( const char* name, Graph* g ) {
                 else {
                     switch( flag ) {
                         case 1: // input
-                            i = strcspn( tok2, digits );
                             g->addInput( string(tok2) );
                             break;
                         case 2: // output
-                            i = strcspn( tok2, digits );
                             g->addOutput( string(tok2) );
                             break;
                         case 3: // wire
-                            i = strcspn( tok2, digits );
-                            g->addEdge( string(tok2), atoi(&tok2[i]) );
+                            g->addWire( string(tok2) );
                             break;
                         default: break;
                     }
@@ -90,73 +88,24 @@ bool read_verilog( const char* name, Graph* g ) {
             string name(tok2);
             g->addGate( name, t);
             Node *gt = g->gates[name];
-            tok2 = strtok( NULL, " (" );
-            tok2 = strtok( NULL, ")" );
-            if( t == NOT) {
+            int gn = ( t == NOT)? 2: 3;
+            for( int i = 0; i < gn; i++ ) {
+                tok2 = strtok( NULL, "." );
+                tok2 = strtok( NULL, "(" );
+                bool flag = 1;// 0:Y, 1:A or B
+                if( string(tok2) == string("Y"))
+                    flag = 0;
+                else flag = 1;
+                tok2 = strtok( NULL, ")" );
                 string tmp(tok2);
-                if( g->inputs.find(tmp) != g->inputs.end() ) {
-                    g->inputs[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->inputs[tmp] );
-                }
-                else if( g->outputs.find(tmp) != g->outputs.end() ) {
-                    g->outputs[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->outputs[tmp] );
+                Node *n = g->getNode( tmp );
+                if( flag == 0) {
+                    n->in.push_back(gt);
+                    gt->out.push_back(n);
                 }
                 else {
-                    g->wires[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->wires[tmp] );
-                }
-                tok2 = strtok( NULL, "(" );
-                tok2 = strtok( NULL, ")" );
-                tmp = string(tok2);
-                if( g->outputs.find(tmp) != g->outputs.end() ) {
-                    g->outputs[tmp]->in.push_back( gt );
-                    gt->out.push_back( g->outputs[tmp] );
-                }
-                else {
-                    g->wires[tmp]->in.push_back( gt );
-                    gt->out.push_back( g->wires[tmp] );
-                }
-            }
-            else {
-                string tmp(tok2);
-                if( g->inputs.find(tmp) != g->inputs.end() ) {
-                    g->inputs[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->inputs[tmp] );
-                }
-                else if( g->outputs.find(tmp) != g->outputs.end() ) {
-                    g->outputs[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->outputs[tmp] );
-                }
-                else {
-                    g->wires[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->wires[tmp] );
-                }
-                tok2 = strtok( NULL, "(" );
-                tok2 = strtok( NULL, ")" );
-                tmp = string(tok2);
-                if( g->inputs.find(tmp) != g->inputs.end() ) {
-                    g->inputs[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->inputs[tmp] );
-                }
-                else if( g->outputs.find(tmp) != g->outputs.end() ) {
-                    g->outputs[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->outputs[tmp] );
-                }
-                else {
-                    g->wires[tmp]->out.push_back( gt );
-                    gt->in.push_back( g->wires[tmp] );
-                }
-                tok2 = strtok( NULL, "(" );
-                tok2 = strtok( NULL, ")" );
-                tmp = string(tok2);
-                if( g->outputs.find(tmp) != g->outputs.end() ) {
-                    g->outputs[tmp]->in.push_back( gt );
-                    gt->out.push_back( g->outputs[tmp] );
-                }
-                else {
-                    g->wires[tmp]->in.push_back( gt );
-                    gt->out.push_back( g->wires[tmp] );
+                    n->out.push_back(gt);
+                    gt->in.push_back(n);
                 }
             }
         }
@@ -181,6 +130,23 @@ bool read_verilog( const char* name, Graph* g ) {
     }*/
 
     f.close();
+
+    // build dfs
+    map<string, Node*>::iterator it;
+    for( it = g->inputs.begin(); it != g->inputs.end(); it++ ) {
+        int time = 0;
+        time = g->DFS_Visit(it->second, time);
+    }
+
+    int max_delay = 0;
+    for( it = g->outputs.begin(); it != g->outputs.end(); it++) {
+        Node *n = it->second;
+        if( n->time >= max_delay) max_delay = n->time;
+        cout << "name: " << n->name
+             << ", time: " << n->time
+             << ", d: " << n->d << "\n\n";
+    }
+
     return true;
 }
 
