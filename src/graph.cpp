@@ -6,14 +6,14 @@
 // **************************************************************************
 #include "graph.h"
 
-/*Edge::Edge(string name, const int& id)
+Edge::Edge(string name)
 {
 	this->name = name;
-	this->id = id;
 }
 
-bool Edge::operator < (const Edge& rhs) const{
-
+bool Edge::operator < (const Edge& rhs) const
+{
+	return this->time < rhs.time;
 }
 Node * Edge::getNeighbor(Node *n)
 {
@@ -21,15 +21,17 @@ Node * Edge::getNeighbor(Node *n)
 	if ( node[1] == n ) return node[0];
 
 	return 0;
-}*/
+}
 
 
 Node::Node (string n, GateType t)
 {
 	name = n;
 	type = t;
+	true_path = 2;
 	traveled = false;
-	d = DIS_INF;
+	time = 0;
+	delay_time = 1;
 	prev = 0;
 }
 
@@ -73,28 +75,43 @@ Graph::~Graph()
 	}
 }
 		
-void Graph::addEdge(string name, const int& id)
+void Graph::addWire(string name)
 {
-	Node *e = new Node(name, GateType(WIRE));
-	wires[name] = e;
+	if(wires.find(name) == wires.end())
+	{
+		Node *e = new Node(name, GateType(WIRE));
+		wires[name] = e;
+		e->delay_time = 0;
+	}
 }
 
 void Graph::addInput(string name)
 {
-	Node *n = new Node(name, GateType(INPUT));
-	inputs[name] = n;
+	if(inputs.find(name) == inputs.end())
+	{
+		Node *n = new Node(name, GateType(INPUT));
+		inputs[name] = n;
+		n->delay_time = 0;
+	}
 }
 
 void Graph::addOutput(string name)
 {
-	Node *n = new Node(name, GateType(OUTPUT));
-	outputs[name] = n;
+	if(outputs.find(name) == outputs.end())
+	{
+		Node *n = new Node(name, GateType(OUTPUT));
+		outputs[name] = n;
+		n->delay_time = 0;
+	}
 }
 
 void Graph::addGate(string name, GateType type)
 {
-	Node *n = new Node(name, type);
-	gates[name] = n;
+	if(gates.find(name) == gates.end())
+	{
+		Node *n = new Node(name, type);
+		gates[name] = n;
+	}
 }
 	
 /*void Graph::sortEdgesOfNode()
@@ -108,43 +125,47 @@ bool edgeCompByW( const Edge* A, const Edge* B ){
 
 void Graph::sortEdgesByWeight()
 {
-}
+}*/
 void Graph::init()
 {
-	map<string, Node *>::iterator itN;
-	for ( itN = gates.begin() ; itN != gates.end() ; itN++ )
+	map<string, Node *>::iterator it;
+	for ( it = gates.begin(); it != gates.end(); it++ )
 	{
-		Node *node = (*itN).second;
+		Node *node = (*it).second;
 		node->traveled = false;
-		node->d = DIS_INF;
-		node->i = 0;
-		node->f = 0;
 		node->prev = 0;
 	}
 	
-}*/
+}
 
 Node * Graph::getNode(string name)
 {
-	return gates[name];
+	if(inputs.find(name) != inputs.end())
+		return inputs[name];
+	if(outputs.find(name) != outputs.end())
+		return outputs[name];
+	if(wires.find(name) != wires.end())
+		return wires[name];
+	if(gates.find(name) != gates.end())
+		return gates[name];
+	return NULL;
 }
 
-/*int Graph::DFS_Visit (Node* u, int time, ofstream& o)
+int Graph::DFS_Visit (Node* u, int time)
 {
 	time++;
-	u->i = time;
+	u->d = time;
 	u->traveled = true;
-	for (vector<Edge*>::iterator i = u->edge.begin();
-		i != u->edge.end(); ++i) {
-		Node* v = (*i)->getNeighbor(u);
-		if (v->traveled == false) {
-			o << "v" << u->id << " -- v" << v->id
-			  << " [label = \"" << (*i)->weight << "\"];\n";
-			v->prev = u;
-			time = Graph::DFS_Visit(v, time, o);
+	vector<Node*>::iterator itN;
+	for(itN = u->out.begin(); itN != u->out.end(); itN++) {
+		//if((*itN)->traveled == false) {
+		if((*itN)->time <= u->time) {
+			(*itN)->prev = u;
+			(*itN)->time = u->time + u->delay_time;
+			time = this->DFS_Visit((*itN), time);
 		}
 	}
 	time++;
 	u->f = time;
-	return time;
-}*/
+        return time;
+}

@@ -23,25 +23,21 @@ enum	GateType { INPUT = 0, OUTPUT, WIRE, NOT, AND, NAND, OR, NOR };
 
 class Node;
 
-/*class Edge {
+class Edge {
 
 	public:
-		Edge (string name, const int& id);
-		Edge (const int& i) { id = i; }
+		Edge (string name);
 		Node* node[2];
 		string name;
 		int time;
-		int id;
 
 		Node *getNeighbor (Node *n);
 		void addIn (Node *in) { node[0] = in; }
 		void addOut (Node *out) { node[1] = out; }
-		void setTime (const int& t) { time = t; }
-		void addTime (const int& t) { time += t; }
 
 		bool operator < (const Edge& rhs) const;
 
-};*/
+};
 
 class Node {
 
@@ -52,12 +48,19 @@ class Node {
 
 		string   name;
 		GateType type;
-		bool     traveled;
+
+		int  true_path; // 0 or 1
+		// int  controlling;
+		// int  non_controlling;
+		bool traveled;
+
+		int time;
+		int delay_time;
+
 		vector<Node*> in;
 		vector<Node*> out;
 
 		int d;
-		int i;
 		int f;
 		Node *prev;
 };
@@ -69,7 +72,7 @@ class Graph {
 		Graph(const string& n = string("case"));
 		~Graph();
 		
-		void addEdge(string name, const int& id);
+		void addWire(string name);
 		void addInput(string name);
 		void addOutput(string name);
 		void addGate(string name, GateType type);
@@ -77,7 +80,7 @@ class Graph {
 		// void sortEdgesByWeight();
 		void init();
 		Node * getNode(string name);
-		int  DFS_Visit(Node* u, int time, ofstream& o);
+		int  DFS_Visit(Node* u, int time);
 
 		map<string, Node *> inputs;
 		map<string, Node *> outputs;
