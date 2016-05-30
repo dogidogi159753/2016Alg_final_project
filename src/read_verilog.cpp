@@ -137,13 +137,18 @@ bool read_verilog( const char* name, Graph* g ) {
         int time = 0;
         time = g->DFS_Visit(it->second, time);
     }
-
-    for( it = g->outputs.begin(); it != g->outputs.end(); it++) {
+    /*for( it = g->outputs.begin(); it != g->outputs.end(); it++) {
         Node *n = it->second;
         cout << "name: " << n->name
              << ", time: " << n->time
-             << ", d: " << n->d << "\n\n";
+             << ", level: " << n->level << "\n\n";
     }
+    for( it = g->gates.begin(); it != g->gates.end(); it++) {
+        Node *n = it->second;
+        cout << "name: " << n->name
+             << ", time: " << n->time
+             << ", level: " << n->level << "\n\n";
+    }*/
 
     return true;
 }
