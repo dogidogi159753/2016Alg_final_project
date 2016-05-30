@@ -13,6 +13,8 @@
 using namespace std;
 
 #include "read_verilog.h"
+#include "graph.h"
+#include "current_design.h"
 
 int main( int argc, char **argv ) {
     if( argc != 2 ) {
@@ -22,6 +24,7 @@ int main( int argc, char **argv ) {
     }
     Graph *g = new Graph;
     read_verilog( argv[1], g );
+    current_design( g );
     delete g;
     return 0;
 }

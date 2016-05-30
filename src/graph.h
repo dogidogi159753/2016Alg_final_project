@@ -49,12 +49,14 @@ class Node {
 		string   name;
 		GateType type;
 
-		int  true_path; // 0 or 1
-		// int  controlling;
-		// int  non_controlling;
+		bool non_controlling;
 		bool traveled;
+		bool out_value;
+		bool solved;
+		int  true_path; // 0:no, 1:in[0], 2:in[1]
+		int  level;
 
-		int time;
+		int time; // 0:out, 1:in1, 2:in2
 		int delay_time;
 
 		vector<Node*> in;
@@ -63,6 +65,10 @@ class Node {
 		int d;
 		int f;
 		Node *prev;
+
+		size_t find_in(Node *n);
+		Node*  find_in_neighbor(Node *n);
+		bool   determine_path(Node *n);
 };
 
 
