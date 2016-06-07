@@ -23,11 +23,11 @@ bool current_design( Graph *g )
     for( in = g->inputs.begin(); in != g->inputs.end(); in++ ) {
         for( int i = 0; i < 2; i++ ) {
             Node *n = in->second;
-            vector<Node*> solved_nodes;
             g->init();
             n->out_value = i;
             n->solved = true;
-            n = path_step( n, solved_nodes, count );
+            n = path_step( n, count );
+//cout << endl;
         }
     }
     cout << "total true path num: " << count << endl;
@@ -45,38 +45,39 @@ bool current_design( Graph *g )
     return true;
 }
 
-Node* path_step( Node *n, vector<Node*>& solved_nodes, int &count )
+Node* path_step( Node *n, int &count )
 {
     vector<Node*>::iterator i;
     Node *r = n;
+//cout << n->name << "(" << n->level << ", " << n->time << ")" << "->";
+//if( n->type == OUTPUT ) cout << "output\n";
     if( n->type == OUTPUT ) count++;
     for( i = n->out.begin(); i != n->out.end(); i++ ) {
         Node *o = *i;
         if( !o->solved ) { // not decide the true path yet
-            if( !o->determine_path( n ) ) { // no true path
+            if( !o->determine_path( n ) ) { // non-controlling
                 Node *n2 = o->find_in_neighbor(n);
                 bool need_value = ( o->type == NAND )? true: false;
                 if( n2->level <= n->time ) {
-                    solved_nodes.push_back( o );
-                    size_t s = solved_nodes.size()-1;
+                    vector<Node*> solved_nodes;
                     bool flag = path_back( n2, need_value, solved_nodes );
                     if( flag )
-                       r = path_step( o, solved_nodes, count );
+                       r = path_step( o, count );
                     else {
+//cout << "fail1\n";
                         vector<Node*>::iterator sn;
-                        for( sn = solved_nodes.begin() + s;
+                        for( sn = solved_nodes.begin();
                              sn != solved_nodes.end(); sn++ )
                             (*sn)->solved = false;
-                        solved_nodes.erase( solved_nodes.begin() + s, sn-1 );
                     }
                 }
                 else {
+//cout << "fail2\n";
                     o->non_controlling = false;
                 }
             }
             else { // find true path
-                solved_nodes.push_back( o );
-                r = path_step( o, solved_nodes, count );
+                r = path_step( o, count );
             }
         }
     }
@@ -85,6 +86,7 @@ Node* path_step( Node *n, vector<Node*>& solved_nodes, int &count )
 
 bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes )
 {
+//cout << n->name << "(" << n->level << ", " << n->time << ")" << "<-";
     bool flag = false;
     if( n->solved ) {
         if( n->out_value != need_value )

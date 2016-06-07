@@ -106,6 +106,9 @@ bool Node::determine_path(Node *n)
 				}
 			}
 			else {
+				this->time = n->time + delay_time;
+				this->true_path = 1+find_in(n);
+				this->solved = true;
 				non_controlling = true;
 				return false;
 			}
@@ -136,6 +139,7 @@ bool Node::determine_path(Node *n)
 				}
 			}
 			else {
+				this->time = n->time + delay_time;
 				non_controlling = true;
 				return false;
 			}
@@ -301,13 +305,13 @@ int Graph::DFS_Visit (Node* u, int time)
 	vector<Node*>::iterator itN;
 	for(itN = u->out.begin(); itN != u->out.end(); itN++)
 	{
+		if(!(*itN)->traveled)
+			(*itN)->level = u->level+(*itN)->delay_time;
+		else if((*itN)->type == NOR || (*itN)->type == NAND) {
+			if((*itN)->level >= u->level+(*itN)->delay_time)
+				(*itN)->level = u->level+(*itN)->delay_time;
+		}
 		if((*itN)->time-(*itN)->delay_time < u->time) {
-			if((*itN)->level == 0)
-				(*itN)->level = u->level+u->delay_time;
-			else {
-				if((*itN)->level >= u->level+u->delay_time)
-					(*itN)->level = u->level+u->delay_time;
-			}
 			(*itN)->time = u->time + (*itN)->delay_time;
 			(*itN)->prev = u;
 			time = this->DFS_Visit((*itN), time);

@@ -13,7 +13,7 @@
 
 bool current_design( Graph *g );
 
-Node* path_step( Node *n, vector<Node*>& solved_nodes, int &count );
+Node* path_step( Node *n, int &count );
 
 bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes );
 
