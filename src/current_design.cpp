@@ -51,7 +51,13 @@ Node* path_step( Node *n, int &count )
     Node *r = n;
 //cout << n->name << "(" << n->level << ", " << n->time << ")" << "->";
 //if( n->type == OUTPUT ) cout << "output\n";
-    if( n->type == OUTPUT ) count++;
+    if( n->type == OUTPUT ) {
+        count++;
+        ofstream ofs( "test.out", ofstream::app );
+        ofs << endl << count << endl;
+        write_true_path( ofs, n, count);
+        ofs.close();
+    }
     for( i = n->out.begin(); i != n->out.end(); i++ ) {
         Node *o = *i;
         if( !o->solved ) { // not decide the true path yet
@@ -124,10 +130,8 @@ bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes )
                     flag = path_back( n->in[0], true, solved_nodes) &&
                            path_back( n->in[1], true, solved_nodes);
                 else {
-                    if( n->in[0]->level <= n->in[1]->level )
-                        flag = path_back( n->in[0], false, solved_nodes );
-                    else
-                        flag = path_back( n->in[1], false, solved_nodes );
+                    flag = path_back( n->in[0], false, solved_nodes ) ||
+                           path_back( n->in[1], false, solved_nodes );
                 }
                 break;
             case NOR:
@@ -138,10 +142,8 @@ bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes )
                     flag = path_back( n->in[0], false, solved_nodes) &&
                            path_back( n->in[1], false, solved_nodes);
                 else {
-                    if( n->in[0]->level <= n->in[1]->level )
-                        flag = path_back( n->in[0], true, solved_nodes );
-                    else
-                        flag = path_back( n->in[1], true, solved_nodes );
+                    flag = path_back( n->in[0], true, solved_nodes ) ||
+                           path_back( n->in[1], true, solved_nodes );
                 }
                 break;
             default: break;
@@ -150,35 +152,70 @@ bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes )
     return flag;
 }
 
-/*void find_true_path( Graph *g, vector<string>& path,
-                     map<string, bool>& input_vector )
+void write_true_path( ofstream& o, Node *n, int count )
 {
-
-    g->init();
-    map<string, Node*>::iterator in;
-    for( in = g->inputs.begin(); in != g->inputs.end(); in++ ) {
-        in->second->out_value = input_vector[in->second->name];
-    }
-    for( in = g->inputs.begin(); in != g->inputs.end(); in++ ) {
-        Node *n = in->second;
-        while( n->out.size() != 0 ) {
-            vector<Node*>::iterator it;
-            for( it = n->out.begin();
-                 it != n->out.end(); it++ ) {
-                                
-            }
+    bool flag = true;
+    vector<string> lines;
+    while( flag ) {
+        int i = ( n->true_path-1 <= 0 )? 0: n->true_path-1;
+        if( n->type == INPUT ) flag = false;
+        Node *prev = ( flag )? n->in[i]: 0;
+        if( n->type == WIRE ) {
+            n = prev;
+            continue;
         }
+        stringstream ss;
+        char in_value, out_value, in_node;
+        switch( n->type ) {
+            case NOT:
+                in_value = ( prev->out_value )? 'r': 'f';
+                out_value = ( n->out_value )? 'r': 'f';
+                ss << "  " << n->name << "/A (NOT1)" << " ?" << "0"
+                   << "          " << n->time-1 << " " << in_value << endl
+                   << "  " << n->name << "/Y (NOT1)" << " ?" << "1"
+                   << "          " << n->time << " " << out_value << endl;
+                break;
+            case NOR:
+                in_value = ( prev->out_value )? 'r': 'f';
+                out_value = ( n->out_value )? 'r': 'f';
+                in_node = ( n->true_path == 1 )? 'A': 'B';
+                ss << "  " << n->name << "/"<< in_node << " (NOR2)"
+                   << " ?" << "0" << "          " << n->time-1 << " "
+                   << in_value << endl
+                   << "  " << n->name << "/Y (NOR2)"
+                   << " ?" << "1" << "          " << n->time << " "
+                   << out_value << endl;
+                break;
+            case NAND:
+                in_value = ( prev->out_value )? 'r': 'f';
+                out_value = ( n->out_value )? 'r': 'f';
+                in_node = ( n->true_path == 1 )? 'A': 'B';
+                ss << "  " << n->name << "/"<< in_node << " (NAND2)"
+                   << " ?" << "0" << "          " << n->time-1 << " "
+                   << in_value << endl
+                   << "  " << n->name << "/Y (NAND2)"
+                   << " ?" << "1" << "          " << n->time << " "
+                   << out_value << endl;
+                break;
+            case INPUT:
+                out_value = ( n->out_value )? 'r': 'f';
+                ss << "  " << n->name << " (in)" << " ?" << "0"
+                   << "          " << n->time << " " << out_value << endl;
+                break;
+            case OUTPUT:
+                out_value = ( n->out_value )? 'r': 'f';
+                ss << "  " << n->name << " (out)" << " ?" << "0"
+                   << "          " << n->time << " " << out_value << endl;
+                break;
+        }
+        lines.push_back( ss.str() );
+        n = prev;
     }
-
+    for( vector<string>::iterator i = lines.end()-1;
+                                        i != lines.begin(); i--) {
+        o << *i;
+    }
+    o << *lines.begin();
 }
-
-void go_path( Node *n )
-{
-    vector<Node*>::iterator out;
-    for( out = n->out.begin(); out != n->out.end(); out++ ) {
-        
-        go_path( *out );
-    }
-}*/
 
 #endif

@@ -17,8 +17,7 @@ Node* path_step( Node *n, int &count );
 
 bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes );
 
-/*void find_true_path( Graph *g, vector<string>& path,
-                     map<string, bool>& input_vector );*/
+void write_true_path( ofstream& o, Node *n, int count );
 
 #endif
 
