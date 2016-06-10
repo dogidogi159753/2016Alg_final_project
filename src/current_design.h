@@ -13,11 +13,12 @@
 
 bool current_design( Graph *g );
 
-Node* path_step( Node *n, int &count );
+Node* path_step( Node *n, int &count, Graph *g,
+                 vector<Node*>& solved_nodes, ofstream& ofs );
 
 bool path_back( Node *n, bool need_value, vector<Node*>& solved_nodes );
 
-void write_true_path( ofstream& o, Node *n, int count );
+void write_true_path( ofstream& o, Graph *g, Node *n, int count );
 
 #endif
 

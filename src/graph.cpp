@@ -140,6 +140,8 @@ bool Node::determine_path(Node *n)
 			}
 			else {
 				this->time = n->time + delay_time;
+				this->true_path = 1+find_in(n);
+				this->solved = true;
 				non_controlling = true;
 				return false;
 			}
@@ -307,7 +309,7 @@ int Graph::DFS_Visit (Node* u, int time)
 	{
 		if(!(*itN)->traveled)
 			(*itN)->level = u->level+(*itN)->delay_time;
-		else if((*itN)->type == NOR || (*itN)->type == NAND) {
+		else {
 			if((*itN)->level >= u->level+(*itN)->delay_time)
 				(*itN)->level = u->level+(*itN)->delay_time;
 		}

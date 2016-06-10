@@ -26,8 +26,10 @@ bool read_verilog( const char* name, Graph* g ) {
 
     f.seekg( 0, ifstream::end );
     int length = f.tellg();
-    cout << "This file has " << length << " chars\n";
+    //cout << "This file has " << length << " chars\n";
     f.seekg( 0, ifstream::beg );
+
+    g->name = string(name);
 
     char buffer[length];
     f.read( buffer, length );
@@ -42,7 +44,7 @@ bool read_verilog( const char* name, Graph* g ) {
             while( tok2 != NULL ) {
                 if( flag == 0 && string(tok2) == string("module") ) {
                     tok2 = strtok( NULL, ", \n");
-                    g->name = string(tok2);
+                    //g->name = string(tok2);
                     break;
                 }
                 else if( flag == 0 && string(tok2) == string("input") ) {
