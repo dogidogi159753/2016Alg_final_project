@@ -94,6 +94,7 @@ class Graph {
 		map<string, Node *> gates;
 		map<string, Node *> wires;
 		string name;
+		int max_delay;
 };
 
 #endif

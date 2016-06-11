@@ -183,6 +183,8 @@ void write_true_path( ofstream& o, Graph *g, Node *n, int count )
 
     bool flag = true;
     vector<string> lines;
+    int output_time = n->time;
+    int space_num = 44;
     while( flag ) {
 //debug
 //if( !n->solved ) o << n->name << " fail\n";
@@ -190,6 +192,8 @@ void write_true_path( ofstream& o, Graph *g, Node *n, int count )
         int i = ( n->true_path-1 <= 0 )? 0: n->true_path-1;
         if( n->type == INPUT ) flag = false;
         Node *prev = ( flag )? n->in[i]: n;
+        int require_num = space_num - n->name.size() - 3;
+        string space;
 //debug
 //if(n->type !=INPUT && !prev->solved)o<<n->find_in_neighbor(prev)->name << ": "<<n->find_in_neighbor(prev)->solved<<"\n";
 //end debug
@@ -209,43 +213,57 @@ void write_true_path( ofstream& o, Graph *g, Node *n, int count )
         }
         switch( n->type ) {
             case NOT:
+                require_num -= 6;
+                for( int j = 0; j < require_num; j++ )
+                    space += ' ';
                 in_value = ( prev->out_value )? 'r': 'f';
                 out_value = ( n->out_value )? 'r': 'f';
-                ss << "  " << n->name << "/A (NOT1)" << " ?" << "0"
-                   << "          " << n->time-n->delay_time << " " << in_value << endl
-                   << "  " << n->name << "/Y (NOT1)" << " ?" << "1"
+                ss << "  " << n->name << "/A (NOT1)" << space << "0"
+                   << "          " << n->time-n->delay_time  << ' '
+                   << in_value << endl
+                   << "  " << n->name << "/Y (NOT1)" << space << "1"
                    << "          " << n->time << " " << out_value << endl;
                 break;
             case NOR:
+                require_num -= 6;
+                for( int j = 0; j < require_num; j++ )
+                    space += ' ';
                 in_value = ( prev->out_value )? 'r': 'f';
                 out_value = ( n->out_value )? 'r': 'f';
                 in_node = ( i == 0 )? 'A': 'B';
-                ss << "  " << n->name << "/"<< in_node << " (NOR2)"
-                   << " ?" << "0" << "          " << n->time-n->delay_time << " "
+                ss << "  " << n->name << "/"<< in_node << " (NOR2)" << space
+                   << "0" << "          " << n->time-n->delay_time << " "
                    << in_value << endl
-                   << "  " << n->name << "/Y (NOR2)"
-                   << " ?" << "1" << "          " << n->time << " "
-                   << out_value << endl;
+                   << "  " << n->name << "/Y (NOR2)" << space << "1"
+                   << "          " << n->time << " " << out_value << endl;
                 break;
             case NAND:
+                require_num -= 7;
+                for( int j = 0; j < require_num; j++ )
+                    space += ' ';
                 in_value = ( prev->out_value )? 'r': 'f';
                 out_value = ( n->out_value )? 'r': 'f';
                 in_node = ( i == 0 )? 'A': 'B';
-                ss << "  " << n->name << "/"<< in_node << " (NAND2)"
-                   << " ?" << "0" << "          " << n->time-n->delay_time << " "
+                ss << "  " << n->name << "/"<< in_node << " (NAND2)" << space
+                   << "0" << "          " << n->time-n->delay_time << " "
                    << in_value << endl
-                   << "  " << n->name << "/Y (NAND2)"
-                   << " ?" << "1" << "          " << n->time << " "
-                   << out_value << endl;
+                   << "  " << n->name << "/Y (NAND2)" << space << "1"
+                   << "          " << n->time << " " << out_value << endl;
                 break;
             case INPUT:
+                require_num -= 2;
+                for( int j = 0; j < require_num; j++ )
+                    space += ' ';
                 out_value = ( n->out_value )? 'r': 'f';
-                ss << "  " << n->name << " (in)" << " ?" << "0"
+                ss << "  " << n->name << " (in)" << space << "0"
                    << "          " << n->time << " " << out_value << endl;
                 break;
             case OUTPUT:
+                require_num -= 3;
+                for( int j = 0; j < require_num; j++ )
+                    space += ' ';
                 out_value = ( n->out_value )? 'r': 'f';
-                ss << "  " << n->name << " (out)" << " ?" << "0"
+                ss << "  " << n->name << " (out)" << space << "0"
                    << "          " << n->time << " " << out_value << endl;
                 break;
             default: break;
@@ -260,10 +278,10 @@ void write_true_path( ofstream& o, Graph *g, Node *n, int count )
     o << *lines.begin();
 
     o << "  ---------------------------------------------------------------------------\n"
-      << "  Data Required Time 	        " << 10 << "\n"
-      << "  Data Arrival Time            " << 5 << "\n"
+      << "  Data Required Time           " << g->max_delay << "\n"
+      << "  Data Arrival Time            " << output_time << "\n"
       << "  ---------------------------------------------------------------------------\n"
-      << "  Slack            	         " << 5 << "\n  }\n\n"
+      << "  Slack                        " << g->max_delay - output_time << "\n  }\n\n"
       << "  Input Vector\n  {\n";
     map<string, Node*>::iterator it;
     for( it = g->inputs.begin(); it != g->inputs.end(); it++ ) {

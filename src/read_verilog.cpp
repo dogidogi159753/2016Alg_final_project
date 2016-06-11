@@ -16,16 +16,43 @@ using namespace std;
 // need to fix: only NAND and NOR; position of Y, A, B is not fixed
 
 bool read_verilog( const char* name, Graph* g ) {
-
-    ifstream f(name);
+    // read sdc file
+    char sdc_name[64];
+    strcpy( sdc_name, name );
+    strcat( sdc_name, ".sdc" );
+    ifstream f( sdc_name );
     if( !f.is_open() ) {
         fprintf( stderr, "**ERROR read_verilog: " );
-        fprintf( stderr, "no such file\n" );
+        fprintf( stderr, "no sdc file\n" );
+        return false;
+    }
+    f.seekg( 0, ifstream::end );
+    int length = f.tellg();
+    f.seekg( 0, ifstream::beg );
+    char sdcstr[length];
+    f.read( sdcstr, length );
+    char *t = strtok( sdcstr, "\n " );
+    bool max_delay_find = false;
+    while( t != NULL ) {
+        if( string(t) == string("set_max_delay") )
+            max_delay_find = true;
+        t = strtok( NULL, "\n " );
+        if( max_delay_find ) {
+            g->max_delay = atoi( t );
+            break;
+        }
+    }
+    f.close();
+    // read verilog file
+    f.open( name );
+    if( !f.is_open() ) {
+        fprintf( stderr, "**ERROR read_verilog: " );
+        fprintf( stderr, "no verilog file\n" );
         return false;
     }
 
     f.seekg( 0, ifstream::end );
-    int length = f.tellg();
+    length = f.tellg();
     //cout << "This file has " << length << " chars\n";
     f.seekg( 0, ifstream::beg );
 
