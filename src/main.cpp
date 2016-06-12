@@ -15,6 +15,7 @@ using namespace std;
 #include "read_verilog.h"
 #include "graph.h"
 #include "current_design.h"
+#include "../lib/tm_usage.h" //calculate the running time 
 
 int main( int argc, char **argv ) {
     if( argc != 2 ) {
@@ -22,9 +23,19 @@ int main( int argc, char **argv ) {
         fprintf( stderr, "wrong argument\n" );
         return 0;
     }
-    Graph *g = new Graph;
+	
+	
+	CommonNs::TmUsage tmusg;
+	CommonNs::TmStat stat;
+    
+/*	Time of running true path*/
+	tmusg.periodStart();
+	
+	Graph *g = new Graph;
     read_verilog( argv[1], g );
     current_design( g );
+	tmusg.getPeriodUsage(stat);
+	cout << "The running time of true path: " << (stat.uTime+stat.sTime) /1000.0<< "ms" <<endl;
     delete g;
     return 0;
 }
