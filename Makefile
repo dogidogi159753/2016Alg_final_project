@@ -2,12 +2,11 @@ AR       := ar
 ARFLAGS  := cr
 CXX      := g++
 CPPFLAGS := -g
+CFLAGS = -c 
 
 all : test
 	@echo -n "test\n"
 
-clean :
-	rm *.o test
 
 test : src/main.o src/read_verilog.o src/current_design.o src/graph.o lib
 		$(CXX) $(CPPFLAGS) src/main.o src/read_verilog.o src/current_design.o src/graph.o -ltm_usage -Llib -o test
@@ -28,6 +27,9 @@ lib:	lib/libtm_usage.a
 
 lib/libtm_usage.a	: tm_usage.o
 	$(AR) $(ARFLAGS) $@ $<
-tm_usage.o :	lib/tm_usage.cpp lib/tm_usage.h 
-	$(CXX) $(CPPFLAGS) $<
+tm_usage.o	:	lib/tm_usage.cpp lib/tm_usage.h 
+	$(CXX) $(CFLAGS) $<
 
+
+clean :
+	rm *.o test lib/*.a lib/*.o 
